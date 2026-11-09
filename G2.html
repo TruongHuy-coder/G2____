@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Học Từ Vựng & Kanji Tiếng Nhật - Unit 4-7</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        jpRed: '#E60012',
+                        jpSakura: '#FFB7C5',
+                        jpSoftBg: '#F8FAFC',
+                        jpCardBg: '#FFFFFF',
+                        jpPrimary: '#4F46E5',
+                        jpAccent: '#06B6D4'
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        jp: ['"Noto Sans JP"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f1f5f9;
+        }
+
+        /* 3D Card Flip styles */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+
+        /* Matching Game Card styles */
+        .match-card {
+            perspective: 600px;
+        }
+        .match-card-inner {
+            transition: transform 0.4s;
+            transform-style: preserve-3d;
+        }
+        .match-card.flipped .match-card-inner {
+            transform: rotateY(180deg);
+        }
+        .match-card.matched {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="switchMode('welcome')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-red-500 to-rose-400 flex items-center justify-center text-white font-black text-xl shadow-md shadow-red-200">
+                    日
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg md:text-xl text-slate-800 tracking-tight">Nihongo Master</h1>
+                    <p class="text-xs text-slate-500 font-medium">Ôn tập Từ vựng & Kanji Unit 4 - 7</p>
+                </div>
+            </div>
+
+            <!-- Mode Selector Nav Buttons -->
+            <div class="flex items-center gap-1 sm:gap-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200/80 text-xs sm:text-sm font-semibold">
+                <button id="btn-mode-flashcard" onclick="switchMode('flashcard')" class="px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-slate-600 hover:text-slate-900">
+                    <i class="fa-solid fa-clone text-indigo-500"></i> <span class="hidden sm:inline">Thẻ</span> Flashcard
+                </button>
+                <button id="btn-mode-quiz" onclick="switchMode('quiz')" class="px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-slate-600 hover:text-slate-900">
+                    <i class="fa-solid fa-[#E60012] fa-circle-question text-rose-500"></i> Trắc nghiệm
+                </button>
+                <button id="btn-mode-matching" onclick="switchMode('matching')" class="px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-slate-600 hover:text-slate-900">
+                    <i class="fa-solid fa-[#06B6D4] fa-puzzle-piece text-cyan-500"></i> ghép thẻ
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-5xl mx-auto px-4 py-6 flex-grow w-full">
+
+        <!-- FILTER BAR -->
+        <section class="bg-white rounded-2xl p-4 md:p-5 shadow-sm border border-slate-200/80 mb-6 transition-all">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-filter text-indigo-600 text-lg"></i>
+                    <h2 class="font-bold text-slate-700 text-sm md:text-base">Phạm vi bài học:</h2>
+                </div>
+                
+                <div class="flex flex-wrap items-center gap-2 flex-grow justify-start md:justify-end">
+                    <select id="category-filter" onchange="onFilterChange()" class="bg-slate-50 border border-slate-300 text-slate-700 text-xs sm:text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 p-2.5 font-medium transition-all cursor-pointer outline-none">
+                        <option value="ALL">📚 Tất cả các Bài & Kanji (Full)</option>
+                        <optgroup label="Dữ liệu Từ Vựng">
+                            <option value="U4.1">Unit 4.1 - Hướng & Phương tiện & Thời gian</option>
+                            <option value="U4.2">Unit 4.2 - Địa điểm & Tính từ</option>
+                            <option value="U4.3">Unit 4.3 - Thời tiết & Hương vị</option>
+                            <option value="U5.1">Unit 5.1 - Thời gian (Ngày/Tuần/Tháng/Năm)</option>
+                            <option value="U5.2">Unit 5.2 - Hành động & Trạng thái</option>
+                            <option value="U5.3">Unit 5.3 - Đồ vật & Sở thích</option>
+                            <option value="U6.1">Unit 6.1 - Sự kiện & Rủ rê</option>
+                            <option value="U6.2">Unit 6.2 - Đồ ăn thức uống & So sánh</option>
+                            <option value="U7.1">Unit 7.1 - Vị trí & Sự tồn tại</option>
+                            <option value="U7.2">Unit 7.2 - Đồ dùng gia đình & Động từ</option>
+                            <option value="U7.3">Unit 7.3 - Giải trí, Truyền thông & Hành động</option>
+                        </optgroup>
+                        <optgroup label="Dữ liệu Kanji">
+                            <option value="KANJI_ALL">🉐 Tất cả Kanji Bài 4 - 7</option>
+                            <option value="KANJI_4">Kanji Bài 4 (Đông, Kinh, Danh, Tiền, Quốc, Nam, Nữ, Khu, Thị)</option>
+                            <option value="KANJI_5">Kanji Bài 5 (Tiên, Chu, Mỗi, Ngọ, Hậu, Kiến, Thực, Ẩm, Mãi, Vật)</option>
+                            <option value="KANJI_6">Kanji Bài 6 (Hành, Hưu, Kim, Lai, Quy, Hội, Xã, Văn, Độc, Thư, Thoại, Tự, Ngôn, Bôi, Điền, Lực, Môn, Nhục, Liệu, Lý, Dã)</option>
+                            <option value="KANJI_7">Kanji Bài 7 (Bán, Đại, Tiểu)</option>
+                        </optgroup>
+                    </select>
+
+                    <button onclick="shuffleCurrentDataset()" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs sm:text-sm rounded-xl transition-all flex items-center gap-1.5" title="Tráo đổi thứ tự bài học">
+                        <i class="fa-solid fa-shuffle text-indigo-500"></i> Xáo trộn
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 0: WELCOME SCREEN -->
+        <section id="view-welcome" class="space-y-6">
+            <div class="bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 rounded-3xl p-8 md:p-12 text-white shadow-xl relative overflow-hidden text-center md:text-left">
+                <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl font-jp select-none pointer-events-none">
+                    日本語
+                </div>
+                <div class="relative z-10 max-w-2xl">
+                    <span class="px-3 py-1 bg-white/20 backdrop-blur-md text-white rounded-full text-xs font-bold uppercase tracking-wider mb-4 inline-block">
+                        Chương trình ôn tập Minna no Nihongo
+                    </span>
+                    <h2 class="text-3xl md:text-5xl font-black mb-4 leading-tight">Chinh Phục Từ Vựng & Kanji Tiếng Nhật</h2>
+                    <p class="text-indigo-100 text-sm md:text-base font-normal leading-relaxed mb-8">
+                        Ứng dụng giúp bạn nhanh chóng ghi nhớ toàn bộ từ vựng và Kanji từ Unit 4 đến Unit 7 thông qua phương pháp thẻ lật sinh động, bài kiểm tra trắc nghiệm và trò chơi lật hình ghi nhớ.
+                    </p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <button onclick="switchMode('flashcard')" class="p-4 bg-white text-indigo-900 rounded-2xl font-bold hover:bg-indigo-50 transition-all shadow-md hover:-translate-y-0.5 flex flex-col items-center justify-center gap-2 group">
+                            <i class="fa-solid fa-clone text-2xl text-indigo-600 group-hover:scale-110 transition-transform"></i>
+                            <span>Thẻ Flashcard</span>
+                        </button>
+                        <button onclick="switchMode('quiz')" class="p-4 bg-white text-indigo-900 rounded-2xl font-bold hover:bg-indigo-50 transition-all shadow-md hover:-translate-y-0.5 flex flex-col items-center justify-center gap-2 group">
+                            <i class="fa-solid fa-circle-question text-2xl text-rose-500 group-hover:scale-110 transition-transform"></i>
+                            <span>Trắc Nghiệm</span>
+                        </button>
+                        <button onclick="switchMode('matching')" class="p-4 bg-white text-indigo-900 rounded-2xl font-bold hover:bg-indigo-50 transition-all shadow-md hover:-translate-y-0.5 flex flex-col items-center justify-center gap-2 group">
+                            <i class="fa-solid fa-puzzle-piece text-2xl text-cyan-500 group-hover:scale-110 transition-transform"></i>
+                            <span>Ghép Thẻ Thách Thức</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Overview Card -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-book"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Tổng số từ</p>
+                        <p id="stat-total-words" class="text-2xl font-extrabold text-slate-800">150+</p>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-kanji-character text-2xl">字</i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Hán Tự Kanji</p>
+                        <p id="stat-total-kanji" class="text-2xl font-extrabold text-slate-800">40+</p>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Điểm Cao Nhất</p>
+                        <p id="stat-high-score" class="text-2xl font-extrabold text-slate-800">0</p>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-fire"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Chuỗi đúng</p>
+                        <p id="stat-streak" class="text-2xl font-extrabold text-slate-800">0</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 1: FLASHCARD MODE -->
+        <section id="view-flashcard" class="hidden space-y-6">
+            <!-- Progress & Controls -->
+            <div class="flex items-center justify-between">
+                <span id="fc-progress-text" class="text-xs md:text-sm font-bold text-slate-500 bg-slate-200/70 px-3 py-1 rounded-full">
+                    Thẻ 1 / 10
+                </span>
+                <div class="flex items-center gap-2">
+                    <button onclick="speakCurrentWord()" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg font-semibold text-xs transition-all flex items-center gap-1.5" title="Phát âm tiếng Nhật">
+                        <i class="fa-solid fa-volume-high"></i> Phát âm
+                    </button>
+                    <button onclick="toggleAutoPlayFlashcard()" id="btn-fc-autoplay" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold text-xs transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-play"></i> Tự động lật
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3D Card Container -->
+            <div class="perspective-1000 w-full max-w-xl mx-auto h-80 sm:h-96">
+                <div id="flashcard-element" onclick="flipFlashcard()" class="transform-style-3d relative w-full h-full cursor-pointer rounded-3xl shadow-xl border border-slate-200/80 bg-white hover:shadow-2xl transition-shadow duration-300">
+                    
+                    <!-- Card Front (Japanese Kanji / Word) -->
+                    <div class="backface-hidden absolute inset-0 w-full h-full rounded-3xl p-8 flex flex-col justify-between items-center text-center bg-gradient-to-b from-white to-slate-50">
+                        <div class="w-full flex justify-between items-center text-xs font-semibold text-slate-400">
+                            <span id="fc-category-badge" class="px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded-md font-bold">Unit 4.1</span>
+                            <span>Mặt trước (Nhấn để lật)</span>
+                        </div>
+
+                        <div class="my-auto space-y-3">
+                            <h3 id="fc-front-main" class="text-4xl sm:text-6xl font-black font-jp text-slate-800 tracking-wide">
+                                きた
+                            </h3>
+                            <p id="fc-front-sub" class="text-sm font-medium text-slate-400">
+                                (Nhấp vào thẻ để xem nghĩa)
+                            </p>
+                        </div>
+
+                        <div class="text-xs text-slate-400 flex items-center gap-1">
+                            <i class="fa-solid fa-rotate"></i> Chạm hoặc nhấp chuột để lật
+                        </div>
+                    </div>
+
+                    <!-- Card Back (Hiragana, Romaji & Vietnamese) -->
+                    <div class="rotate-y-180 backface-hidden absolute inset-0 w-full h-full rounded-3xl p-8 flex flex-col justify-between items-center text-center bg-gradient-to-b from-indigo-900 to-slate-900 text-white">
+                        <div class="w-full flex justify-between items-center text-xs font-semibold text-indigo-300">
+                            <span class="px-2.5 py-1 bg-indigo-800/60 rounded-md font-bold">Giải nghĩa</span>
+                            <span>Mặt sau</span>
+                        </div>
+
+                        <div class="my-auto space-y-3">
+                            <p id="fc-back-kanji-hira" class="text-xl sm:text-2xl font-bold font-jp text-indigo-200">
+                                北 (きた)
+                            </p>
+                            <p id="fc-back-romaji" class="text-sm font-semibold text-indigo-300 tracking-wider uppercase">
+                                Kita
+                            </p>
+                            <h4 id="fc-back-meaning" class="text-2xl sm:text-4xl font-extrabold text-amber-300 pt-2">
+                                Hướng Bắc
+                            </h4>
+                        </div>
+
+                        <div class="text-xs text-indigo-300 flex items-center gap-1">
+                            <i class="fa-solid fa-rotate"></i> Chạm để quay lại mặt trước
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Flashcard Nav Controls -->
+            <div class="flex items-center justify-center gap-4 max-w-md mx-auto pt-2">
+                <button onclick="prevFlashcard()" class="w-12 h-12 rounded-full bg-white border border-slate-200 shadow-md hover:bg-slate-50 text-slate-700 flex items-center justify-center text-lg font-bold transition-all hover:scale-105 active:scale-95">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <button onclick="markFlashcardMastered()" class="flex-1 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95">
+                    <i class="fa-solid fa-check"></i> Đã nhớ từ này
+                </button>
+                <button onclick="nextFlashcard()" class="w-12 h-12 rounded-full bg-white border border-slate-200 shadow-md hover:bg-slate-50 text-slate-700 flex items-center justify-center text-lg font-bold transition-all hover:scale-105 active:scale-95">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- VIEW 2: QUIZ MODE -->
+        <section id="view-quiz" class="hidden space-y-6">
+            <!-- Quiz Progress & Score Header -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-sm">
+                        Q
+                    </span>
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold">Tiến độ Trắc nghiệm</p>
+                        <p id="quiz-progress-text" class="text-sm font-bold text-slate-800">Câu 1 / 10</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-6">
+                    <div class="text-right">
+                        <p class="text-xs text-slate-400 font-semibold">Điểm số</p>
+                        <p id="quiz-score-text" class="text-lg font-extrabold text-indigo-600">0 Pts</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Question Box -->
+            <div class="bg-white rounded-3xl p-6 md:p-10 shadow-lg border border-slate-200/80 text-center space-y-6">
+                <span id="quiz-question-type" class="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full inline-block">
+                    Chọn đáp án đúng bằng tiếng Việt
+                </span>
+
+                <div id="quiz-question-display" class="text-4xl sm:text-6xl font-black font-jp text-slate-800 py-4">
+                    ひこうき
+                </div>
+
+                <!-- 4 Options Grid -->
+                <div id="quiz-options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-4">
+                    <!-- Options populated via JS -->
+                </div>
+            </div>
+
+            <!-- Quiz Feedback Notification Banner -->
+            <div id="quiz-feedback" class="hidden rounded-2xl p-4 text-center font-bold text-sm transition-all">
+                <!-- Feedback text populated dynamically -->
+            </div>
+        </section>
+
+        <!-- VIEW 3: MATCHING GAME MODE -->
+        <section id="view-matching" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-cyan-100 text-cyan-600 flex items-center justify-center font-bold text-sm">
+                        <i class="fa-solid fa-puzzle-piece"></i>
+                    </span>
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-800">Trò chơi Lật Thẻ Ghi Nhớ</h3>
+                        <p class="text-xs text-slate-400 font-medium">Ghép từ Nhật/Kanji tương ứng với nghĩa Tiếng Việt</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <div class="text-right">
+                        <p class="text-xs text-slate-400 font-semibold">Cặp đã ghép</p>
+                        <p id="match-pairs-count" class="text-base font-bold text-cyan-600">0 / 6</p>
+                    </div>
+                    <button onclick="initMatchingGame()" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl font-bold text-xs shadow-md transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-rotate-right"></i> Ván mới
+                    </button>
+                </div>
+            </div>
+
+            <!-- Matching Cards Grid (12 Cards - 6 pairs) -->
+            <div id="matching-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
+                <!-- Cards injected dynamically -->
+            </div>
+        </section>
+
+        <!-- RESULT / FINISH OVERLAY MODAL -->
+        <div id="modal-result" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-2xl border border-slate-100 space-y-6 transform transition-all scale-95 opacity-0" id="modal-result-content">
+                <div class="w-20 h-20 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center text-4xl mx-auto shadow-inner">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-black text-slate-800">Xuất Sắc! Hoàn Thành!</h3>
+                    <p class="text-sm text-slate-500 mt-1">Bạn đã hoàn thành xuất sắc lượt ôn tập này.</p>
+                </div>
+
+                <div class="bg-slate-50 rounded-2xl p-4 grid grid-cols-2 gap-4 border border-slate-100">
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Tổng Điểm</p>
+                        <p id="result-score" class="text-2xl font-extrabold text-indigo-600">100</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase">Độ Chính Xác</p>
+                        <p id="result-accuracy" class="text-2xl font-extrabold text-emerald-600">100%</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <button onclick="closeResultModal()" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-all text-sm">
+                        Đóng
+                    </button>
+                    <button onclick="restartCurrentMode()" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition-all text-sm">
+                        Chơi Lại Lượt Mới
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 py-4 mt-8">
+        <div class="max-w-5xl mx-auto px-4 text-center text-xs text-slate-400 font-medium">
+            Phần mềm Ôn tập Tiếng Nhật Tương Tác • Minna no Nihongo Unit 4-7
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // ==========================================
+        // 1. DATA STORE (FULL VOCAB & KANJI LESSONS 4-7)
+        // ==========================================
+        const rawDataset = [
+            // UNIT 4.1
+            { cat: "U4.1", main: "きた", hira: "きた", kanji: "北", romaji: "kita", mean: "Hướng Bắc" },
+            { cat: "U4.1", main: "みなみ", hira: "みなみ", kanji: "南", romaji: "minami", mean: "Hướng Nam" },
+            { cat: "U4.1", main: "ひがし", hira: "ひがし", kanji: "東", romaji: "higashi", mean: "Hướng Đông" },
+            { cat: "U4.1", main: "にし", hira: "にし", kanji: "西", romaji: "nishi", mean: "Hướng Tây" },
+            { cat: "U4.1", main: "まんなか", hira: "まんなか", kanji: "真ん中", romaji: "mannaka", mean: "Ở giữa / Trung tâm" },
+            { cat: "U4.1", main: "くるま", hira: "くるま", kanji: "車", romaji: "kuruma", mean: "Xe ô tô" },
+            { cat: "U4.1", main: "しんかんせん", hira: "しんかんせん", kanji: "新幹線", romaji: "shinkansen", mean: "Tàu siêu tốc Shinkansen" },
+            { cat: "U4.1", main: "でんしゃ", hira: "でんしゃ", kanji: "電車", romaji: "densha", mean: "Tàu điện" },
+            { cat: "U4.1", main: "ひこうき", hira: "ひこうき", kanji: "飛行機", romaji: "hikouki", mean: "Máy bay" },
+            { cat: "U4.1", main: "あるいて", hira: "あるいて", kanji: "歩いて", romaji: "aruite", mean: "Đi bộ" },
+            { cat: "U4.1", main: "えき", hira: "えき", kanji: "駅", romaji: "eki", mean: "Nhà ga" },
+            { cat: "U4.1", main: "~くらい", hira: "~くらい", kanji: "", romaji: "~kurai", mean: "Khoảng (~ chừng)" },
+            { cat: "U4.1", main: "どのくらい", hira: "どのくらい", kanji: "", romaji: "donokurai", mean: "Bao lâu / Bao nhiêu" },
+            { cat: "U4.1", main: "~じかん", hira: "~じかん", kanji: "~時間", romaji: "~jikan", mean: "~ tiếng / ~ giờ đồng hồ" },
+            { cat: "U4.1", main: "ふん/ぷん", hira: "ふん/ぷん", kanji: "分", romaji: "fun/pun", mean: "Phút" },
+            { cat: "U4.1", main: "バンコク", hira: "バンコク", kanji: "", romaji: "Bankoku", mean: "Bangkok (Thái Lan)" },
+            { cat: "U4.1", main: "アユタヤ", hira: "アユタヤ", kanji: "", romaji: "Ayutaya", mean: "Ayutthaya" },
+            { cat: "U4.1", main: "シドニー", hira: "シドニー", kanji: "", romaji: "Shidonii", mean: "Sydney" },
+            { cat: "U4.1", main: "パース", hira: "パース", kanji: "", romaji: "Paasu", mean: "Perth" },
+            { cat: "U4.1", main: "ソウル", hira: "ソウル", kanji: "", romaji: "Souru", mean: "Seoul" },
+            { cat: "U4.1", main: "テグ", hira: "テグ", kanji: "", romaji: "Tegu", mean: "Daegu" },
+            { cat: "U4.1", main: "ローマ", hira: "ローマ", kanji: "", romaji: "Rooma", mean: "Rome" },
+            { cat: "U4.1", main: "ナポリ", hira: "ナポリ", kanji: "", romaji: "Napori", mean: "Naples" },
+            { cat: "U4.1", main: "フィレンツェ", hira: "フィレンツェ", kanji: "", romaji: "Firentse", mean: "Florence" },
+            { cat: "U4.1", main: "ハノイ", hira: "ハノイ", kanji: "", romaji: "Hanoi", mean: "Hà Nội" },
+            { cat: "U4.1", main: "ホーチミンし", hira: "ホーチミンし", kanji: "ホーチミン市", romaji: "Hoochimin-shi", mean: "Thành phố Hồ Chí Minh" },
+            { cat: "U4.1", main: "モスクワ", hira: "モスクワ", kanji: "", romaji: "Mosukuwa", mean: "Moscow" },
+
+            // UNIT 4.2 & 4.3
+            { cat: "U4.2", main: "おんせん", hira: "おんせん", kanji: "温泉", romaji: "onsen", mean: "Suối nước nóng" },
+            { cat: "U4.2", main: "かわ", hira: "かわ", kanji: "川", romaji: "kawa", mean: "Sông" },
+            { cat: "U4.2", main: "やま", hira: "やま", kanji: "山", romaji: "yama", mean: "Núi" },
+            { cat: "U4.2", main: "きょうかい", hira: "きょうかい", kanji: "教会", romaji: "kyoukai", mean: "Nhà thờ" },
+            { cat: "U4.2", main: "おしろ", hira: "おしろ", kanji: "城", romaji: "oshiro", mean: "Lâu đài" },
+            { cat: "U4.2", main: "じんじゃ", hira: "じんじゃ", kanji: "神社", romaji: "jinja", mean: "Đền Thần Đạo" },
+            { cat: "U4.2", main: "おてら", hira: "おてら", kanji: "お寺", romaji: "otera", mean: "Chùa" },
+            { cat: "U4.2", main: "ビル", hira: "ビル", kanji: "", romaji: "biru", mean: "Tòa nhà cao tầng" },
+            { cat: "U4.2", main: "ところ", hira: "ところ", kanji: "所", romaji: "tokoro", mean: "Nơi, địa điểm" },
+            { cat: "U4.2", main: "ひと", hira: "ひと", kanji: "人", romaji: "hito", mean: "Người" },
+            { cat: "U4.2", main: "みどり", hira: "みどり", kanji: "緑", romaji: "midori", mean: "Cây xanh / Cây cảnh" },
+            { cat: "U4.2", main: "あります", hira: "あります", kanji: "", romaji: "arimasu", mean: "Có (đồ vật, sự vật)" },
+            { cat: "U4.2", main: "いい", hira: "いい", kanji: "良い", romaji: "ii", mean: "Tốt, hay" },
+            { cat: "U4.2", main: "わるい", hira: "わるい", kanji: "悪い", romaji: "warui", mean: "Xấu, dở" },
+            { cat: "U4.2", main: "あたらし", hira: "あたらしい", kanji: "新しい", romaji: "atarashii", mean: "Mới" },
+            { cat: "U4.2", main: "ふるい", hira: "ふるい", kanji: "古い", romaji: "furui", mean: "Cũ" },
+            { cat: "U4.2", main: "おおい", hira: "おおい", kanji: "多い", romaji: "ooi", mean: "Nhiều" },
+            { cat: "U4.2", main: "すくない", hira: "すくない", kanji: "少ない", romaji: "sukunai", mean: "Ít" },
+            { cat: "U4.2", main: "おおきい", hira: "おおきい", kanji: "大きい", romaji: "ookii", mean: "To, lớn" },
+            { cat: "U4.2", main: "ちいさい", hira: "ちいさい", kanji: "小さい", romaji: "chiisai", mean: "Nhỏ, bé" },
+            { cat: "U4.2", main: "たかい", hira: "たかい", kanji: "高い", romaji: "takai", mean: "Cao / Đắt" },
+            { cat: "U4.2", main: "ひくい", hira: "ひくい", kanji: "低い", romaji: "hikui", mean: "Thấp" },
+            { cat: "U4.2", main: "しずか", hira: "しずか", kanji: "静か", romaji: "shizuka", mean: "Yên tĩnh" },
+            { cat: "U4.2", main: "にぎやか", hira: "にぎやか", kanji: "", romaji: "nigiyaka", mean: "Náo nhiệt, nhộn nhịp" },
+            { cat: "U4.2", main: "ゆうめい", hira: "ゆうめい", kanji: "有名", romaji: "yuumei", mean: "Nổi tiếng" },
+            { cat: "U4.2", main: "きれい", hira: "きれい", kanji: "綺麗", romaji: "kirei", mean: "Đẹp, sạch sẽ" },
+
+            // UNIT 4.3
+            { cat: "U4.3", main: "あめ", hira: "あめ", kanji: "雨", romaji: "ame", mean: "Mưa" },
+            { cat: "U4.3", main: "ゆき", hira: "ゆき", kanji: "雪", romaji: "yuki", mean: "Tuyết" },
+            { cat: "U4.3", main: "ひ", hira: "ひ", kanji: "日", romaji: "hi", mean: "Mặt trời / Ngày" },
+            { cat: "U4.3", main: "メロン", hira: "メロン", kanji: "", romaji: "meron", mean: "Dưa lưới" },
+            { cat: "U4.3", main: "すずしい", hira: "すずしい", kanji: "涼しい", romaji: "suzushii", mean: "Mát mẻ" },
+            { cat: "U4.3", main: "あつい", hira: "あつい", kanji: "暑い", romaji: "atsui", mean: "Nóng (thời tiết)" },
+            { cat: "U4.3", main: "さむい", hira: "さむい", kanji: "寒い", romaji: "samui", mean: "Lạnh (thời tiết)" },
+            { cat: "U4.3", main: "つめたい", hira: "つめたい", kanji: "冷たい", romaji: "tsumetai", mean: "Lạnh (cảm giác đồ vật)" },
+            { cat: "U4.3", main: "あたたかい", hira: "あたたかい", kanji: "暖かい", romaji: "atatakai", mean: "Ấm áp" },
+            { cat: "U4.3", main: "てんきがいい", hira: "てんきがいい", kanji: "天気 tốt", romaji: "tenki ga ii", mean: "Thời tiết đẹp" },
+            { cat: "U4.3", main: "おいしい", hira: "おいしい", kanji: "美味しい", romaji: "oishii", mean: "Ngon" },
+            { cat: "U4.3", main: "あまい", hira: "あまい", kanji: "甘い", romaji: "amai", mean: "Ngọt" },
+            { cat: "U4.3", main: "からい", hira: "からい", kanji: "辛い", romaji: "karai", mean: "Cay" },
+            { cat: "U4.3", main: "にがい", hira: "にがい", kanji: "苦い", romaji: "nigai", mean: "Đắng" },
+            { cat: "U4.3", main: "すっぱい", hira: "すっぱい", kanji: "酸っぱい", romaji: "suppai", mean: "Chua" },
+            { cat: "U4.3", main: "とても", hira: "とても", kanji: "", romaji: "totemo", mean: "Rất" },
+            { cat: "U4.3", main: "すこし", hira: "すこし", kanji: "少し", romaji: "sukoshi", mean: "Một chút, hơi" },
+            { cat: "U4.3", main: "あまり", hira: "あまり", kanji: "", romaji: "amari", mean: "Không... lắm (đi với phủ định)" },
+
+            // UNIT 5.1, 5.2, 5.3
+            { cat: "U5.1", main: "おととい", hira: "おととい", kanji: "一瞬間", romaji: "ototoi", mean: "Hôm kia" },
+            { cat: "U5.1", main: "きのう", hira: "きのう", kanji: "昨日", romaji: "kinou", mean: "Hôm qua" },
+            { cat: "U5.1", main: "きょう", hira: "きょう", kanji: "今日", romaji: "kyou", mean: "Hôm nay" },
+            { cat: "U5.1", main: "あした", hira: "あした", kanji: "明日", romaji: "ashita", mean: "Ngày mai" },
+            { cat: "U5.1", main: "あさって", hira: "あさって", kanji: "明後日", romaji: "asatte", mean: "Ngày kia" },
+            { cat: "U5.1", main: "せんしゅう", hira: "せんしゅう", kanji: "先週", romaji: "senshuu", mean: "Tuần trước" },
+            { cat: "U5.1", main: "こんしゅう", hira: "こんしゅう", kanji: "今週", romaji: "konshuu", mean: "Tuần này" },
+            { cat: "U5.1", main: "らいしゅう", hira: "らいしゅう", kanji: "来週", romaji: "raishuu", mean: "Tuần sau" },
+            { cat: "U5.1", main: "せんげつ", hira: "せんげつ", kanji: "先月", romaji: "sengetsu", mean: "Tháng trước" },
+            { cat: "U5.1", main: "こんげつ", hira: "こんげつ", kanji: "今月", romaji: "kongetsu", mean: "Tháng này" },
+            { cat: "U5.1", main: "らいげつ", hira: "らいげつ", kanji: "来月", romaji: "raigetsu", mean: "Tháng sau" },
+            { cat: "U5.1", main: "きょねん", hira: "きょねん", kanji: "去年", romaji: "kyonen", mean: "Năm ngoái" },
+            { cat: "U5.1", main: "ことし", hira: "ことし", kanji: "今年", romaji: "kotoshi", mean: "Năm nay" },
+            { cat: "U5.1", main: "らいねん", hira: "らいねん", kanji: "来年", romaji: "rainen", mean: "Năm sau" },
+            { cat: "U5.1", main: "けさ", hira: "けさ", kanji: "今朝", romaji: "kesa", mean: "Sáng nay" },
+            { cat: "U5.1", main: "こんばん", hira: "こんばん", kanji: "今晩", romaji: "konban", mean: "Tối nay" },
+
+            // UNIT 5.2
+            { cat: "U5.2", main: "あいます", hira: "あいます", kanji: "会います", romaji: "aimasu", mean: "Gặp (bạn bè)" },
+            { cat: "U5.2", main: "つくります", hira: "つくります", kanji: "作ります", romaji: "tsukurimasu", mean: "Làm, chế tạo" },
+            { cat: "U5.2", main: "かいものします", hira: "かいものします", kanji: "買い物します", romaji: "kaimono shimasu", mean: "Mua sắm" },
+            { cat: "U5.2", main: "しょくじします", hira: "しょくじします", kanji: "食事します", romaji: "shokuji shimasu", mean: "Dùng bữa, ăn uống" },
+            { cat: "U5.2", main: "せんたくします", hira: "せんたくします", kanji: "洗濯します", romaji: "sentaku shimasu", mean: "Giặt giặt đồ" },
+            { cat: "U5.2", main: "そうじします", hira: "そうじします", kanji: "掃除します", romaji: "souji shimasu", mean: "Dọn dẹp vệ sinh" },
+            { cat: "U5.2", main: "のぼります", hira: "のぼります", kanji: "登ります", romaji: "noborimasu", mean: "Leo (núi)" },
+            { cat: "U5.2", main: "はいります", hira: "はいります", kanji: "入ります", romaji: "hairimasu", mean: "Vào (tắm bồn/vào nhà)" },
+            { cat: "U5.2", main: "いそがしい", hira: "いそがしい", kanji: "忙しい", romaji: "isogashii", mean: "Bận rộn" },
+            { cat: "U5.2", main: "ひま", hira: "ひま", kanji: "暇", romaji: "hima", mean: "Rảnh rỗi" },
+            { cat: "U5.2", main: "おもしろい", hira: "おもしろい", kanji: "面白い", romaji: "omoshiroi", mean: "Thú vị, hay" },
+            { cat: "U5.2", main: "たのしい", hira: "たのしい", kanji: "楽しい", romaji: "tanoshii", mean: "Vui vẻ" },
+            { cat: "U5.2", main: "きもちがいい", hira: "きもちがいい", kanji: "気持ちが良い", romaji: "kimochi ga ii", mean: "Dễ chịu, thoải mái" },
+            { cat: "U5.2", main: "かんたん", hira: "かんたん", kanji: "簡単", romaji: "kantan", mean: "Đơn giản, dễ" },
+            { cat: "U5.2", main: "むずかしい", hira: "むずかしい", kanji: "難しい", romaji: "muzukashii", mean: "Khó" },
+            { cat: "U5.2", main: "たいへん", hira: "たいへん", kanji: "大変", romaji: "taihen", mean: "Vất vả, mệt mỏi" },
+
+            // UNIT 5.3
+            { cat: "U5.3", main: "アニメ", hira: "アニメ", kanji: "", romaji: "anime", mean: "Phim hoạt hình Nhật" },
+            { cat: "U5.3", main: "え", hira: "え", kanji: "絵", romaji: "e", mean: "Bức tranh" },
+            { cat: "U5.3", main: "けしき", hira: "けしき", kanji: "景色", romaji: "keshiki", mean: "Phong cảnh" },
+            { cat: "U5.3", main: "じてんしゃ", hira: "じてんしゃ", kanji: "自転車", romaji: "jitensha", mean: "Xe đạp" },
+            { cat: "U5.3", main: "しゃしん", hira: "しゃしん", kanji: "写真", romaji: "shashin", mean: "Bức ảnh" },
+            { cat: "U5.3", main: "とります", hira: "とります", kanji: "撮ります", romaji: "torimasu", mean: "Chụp (ảnh)" },
+            { cat: "U5.3", main: "かります", hira: "かります", kanji: "借ります", romaji: "karimasu", mean: "Mượn" },
+            { cat: "U5.3", main: "ほしい", hira: "ほしい", kanji: "欲しい", romaji: "hoshii", mean: "Muốn có" },
+            { cat: "U5.3", main: "すき", hira: "すき", kanji: "好き", romaji: "suki", mean: "Thích" },
+            { cat: "U5.3", main: "きらい", hira: "きらい", kanji: "嫌い", romaji: "kirai", mean: "Ghét" },
+
+            // UNIT 6.1 & 6.2 & 6.3
+            { cat: "U6.1", main: "カラオケ", hira: "カラオケ", kanji: "", romaji: "karaoke", mean: "Karaoke" },
+            { cat: "U6.1", main: "コンサート", hira: "コンサート", kanji: "", romaji: "konsaato", mean: "Buổi hòa nhạc" },
+            { cat: "U6.1", main: "しあい", hira: "しあい", kanji: "試合", romaji: "shiai", mean: "Trận đấu" },
+            { cat: "U6.1", main: "セール", hira: "セール", kanji: "", romaji: "seeru", mean: "Giảm giá" },
+            { cat: "U6.1", main: "チケット", hira: "チケット", kanji: "", romaji: "chiketto", mean: "Vé" },
+            { cat: "U6.1", main: "ちず", hira: "ちず", kanji: "地図", romaji: "chizu", mean: "Bản đồ" },
+            { cat: "U6.1", main: "ドライブ", hira: "ドライブ", kanji: "", romaji: "doraibu", mean: "Lái xe hóng gió" },
+            { cat: "U6.1", main: "みずぎ", hira: "みずぎ", kanji: "水着", romaji: "mizugi", mean: "Đồ bơi" },
+            { cat: "U6.1", main: "やきゅう", hira: "やきゅう", kanji: "野球", romaji: "yakyuu", mean: "Bóng chày" },
+            { cat: "U6.1", main: "やくそく", hira: "やくそく", kanji: "約束", romaji: "yakusoku", mean: "Lời hứa, cuộc hẹn" },
+            { cat: "U6.1", main: "ようじ", hira: "ようじ", kanji: "用事", romaji: "youji", mean: "Việc bận" },
+            { cat: "U6.1", main: "いっしょに", hira: "いっしょに", kanji: "一緒に", romaji: "isshoni", mean: "Cùng nhau" },
+            { cat: "U6.1", main: "いいですね", hira: "いいですね", kanji: "", romaji: "ii desu ne", mean: "Hay quá nhỉ / Được đấy" },
+            { cat: "U6.1", main: "またこんど", hira: "またこんど", kanji: "また今度", romaji: "mata kondo", mean: "Hẹn lần khác nhé" },
+
+            // UNIT 6.2
+            { cat: "U6.2", main: "たべもの", hira: "たべもの", kanji: "食べ物", romaji: "tabemono", mean: "Đồ ăn" },
+            { cat: "U6.2", main: "のみもの", hira: "のみもの", kanji: "飲み物", romaji: "nomimono", mean: "Đồ uống" },
+            { cat: "U6.2", main: "やきにく", hira: "やきにく", kanji: "焼肉", romaji: "yakiniku", mean: "Thịt nướng" },
+            { cat: "U6.2", main: "ラーメン", hira: "ラーメン", kanji: "", romaji: "raamen", mean: "Mì Ramen" },
+            { cat: "U6.2", main: "たべほうだい", hira: "たべほうだい", kanji: "食べ放題", romaji: "tabehoudai", mean: "Ăn thỏa thích (buffet)" },
+            { cat: "U6.2", main: "コース", hira: "コース", kanji: "", romaji: "koosu", mean: "Khẩu phần / Set ăn" },
+            { cat: "U6.2", main: "いざかや", hira: "いざかや", kanji: "居酒屋", romaji: "izakaya", mean: "Quán nhậu kiểu Nhật" },
+            { cat: "U6.2", main: "えいがかん", hira: "えいがかん", kanji: "映画館", romaji: "eigakan", mean: "Rạp chiếu phim" },
+            { cat: "U6.2", main: "ちかてつ", hira: "ちかてつ", kanji: "地下鉄", romaji: "chikatetsu", mean: "Tàu điện ngầm" },
+            { cat: "U6.2", main: "どちら", hira: "どちら", kanji: "", romaji: "dochira", mean: "Cái nào (trong 2 cái)" },
+            { cat: "U6.2", main: "どちらも", hira: "どちらも", kanji: "", romaji: "dochiramo", mean: "Cả hai" },
+            { cat: "U6.2", main: "ちかい", hira: "ちかい", kanji: "近い", romaji: "chikai", mean: "Gần" },
+            { cat: "U6.2", main: "とおい", hira: "とおい", kanji: "遠い", romaji: "tooi", mean: "Xa" },
+            { cat: "U6.2", main: "はやい", hira: "はやい", kanji: "早い/速い", romaji: "hayai", mean: "Nhanh / Sớm" },
+            { cat: "U6.2", main: "ひろい", hira: "ひろい", kanji: "広い", romaji: "hiroi", mean: "Rộng" },
+            { cat: "U6.2", main: "いちばん", hira: "いちばん", kanji: "一番", romaji: "ichiban", mean: "Nhất (đứng đầu)" },
+            { cat: "U6.2", main: "ぜんぶ", hira: "ぜんぶ", kanji: "全部", romaji: "zenbu", mean: "Toàn bộ, tất cả" },
+            { cat: "U6.2", main: "おこのみやき", hira: "おこのみやき", kanji: "お好み焼き", romaji: "okonomiyaki", mean: "Bánh xèo Nhật Bản" },
+            { cat: "U6.2", main: "すきやき", hira: "すきやき", kanji: "すき焼き", romaji: "sukiyaki", mean: "Món lẩu Sukiyaki" },
+            { cat: "U6.2", main: "あそびます", hira: "あそびます", kanji: "遊びます", romaji: "asobimasu", mean: "Chơi, đi chơi" },
+            { cat: "U6.2", main: "ぜひ", hira: "ぜひ", kanji: "是非", romaji: "zehi", mean: "Nhất định" },
+            { cat: "U6.2", main: "まだです", hira: "まだです", kanji: "", romaji: "mada desu", mean: "Chưa ạ" },
+            { cat: "U6.2", main: "もう", hira: "もう", kanji: "", romaji: "mou", mean: "Đã... rồi" },
+
+            // UNIT 7.1 & 7.2 & 7.3
+            { cat: "U7.1", main: "かいさつ", hira: "かいさつ", kanji: "改札", romaji: "kaisatsu", mean: "Soát vé" },
+            { cat: "U7.1", main: "き", hira: "き", kanji: "木", romaji: "ki", mean: "Cây" },
+            { cat: "U7.1", main: "こうばん", hira: "こうばん", kanji: "交番", romaji: "kouban", mean: "Đồn cảnh sát" },
+            { cat: "U7.1", main: "じどうはんばいき", hira: "じどうはんばいき", kanji: "自動販売機", romaji: "jidouhanbaiki", mean: "Máy bán hàng tự động" },
+            { cat: "U7.1", main: "バスてい", hira: "バスてい", kanji: "バス停", romaji: "basutei", mean: "Trạm xe buýt" },
+            { cat: "U7.1", main: "ポスト", hira: "ポスト", kanji: "", romaji: "posuto", mean: "Hòm thư" },
+            { cat: "U7.1", main: "はな", hira: "はな", kanji: "花", romaji: "hana", mean: "Hoa" },
+            { cat: "U7.1", main: "いぬ", hira: "いぬ", kanji: "犬", romaji: "inu", mean: "Con chó" },
+            { cat: "U7.1", main: "となり", hira: "となり", kanji: "隣", romaji: "tonari", mean: "Bên cạnh" },
+            { cat: "U7.1", main: "ちかく", hira: "ちかく", kanji: "近く", romaji: "chikaku", mean: "Ở gần" },
+            { cat: "U7.1", main: "あいだ", hira: "あいだ", kanji: "間", romaji: "aida", mean: "Ở giữa" },
+            { cat: "U7.1", main: "うえ", hira: "うえ", kanji: "上", romaji: "ue", mean: "Trên" },
+            { cat: "U7.1", main: "した", hira: "した", kanji: "下", romaji: "shita", mean: "Dưới" },
+            { cat: "U7.1", main: "よこ", hira: "よこ", kanji: "横", romaji: "yoko", mean: "Ngang / Bên cạnh" },
+            { cat: "U7.1", main: "なか", hira: "なか", kanji: "中", romaji: "naka", mean: "Trong" },
+            { cat: "U7.1", main: "そと", hira: "そと", kanji: "外", romaji: "soto", mean: "Ngoài" },
+            { cat: "U7.1", main: "まえ", hira: "まえ", kanji: "前", romaji: "mae", mean: "Trước" },
+            { cat: "U7.1", main: "うしろ", hira: "うしろ", kanji: "後ろ", romaji: "ushiro", mean: "Sau" },
+            { cat: "U7.1", main: "みぎ", hira: "みぎ", kanji: "右", romaji: "migi", mean: "Phải" },
+            { cat: "U7.1", main: "ひだり", hira: "ひだり", kanji: "左", romaji: "hidari", mean: "Trái" },
+            { cat: "U7.1", main: "います", hira: "います", kanji: "居ます", romaji: "imasu", mean: "Có (người/động vật)" },
+
+            // UNIT 7.2
+            { cat: "U7.2", main: "じゅんび", hira: "じゅんび", kanji: "準備", romaji: "junbi", mean: "Chuẩn bị" },
+            { cat: "U7.2", main: "いす", hira: "いす", kanji: "椅子", romaji: "isu", mean: "Cái ghế" },
+            { cat: "U7.2", main: "テーブル", hira: "テーブル", kanji: "", romaji: "teeburu", mean: "Bàn ăn" },
+            { cat: "U7.2", main: "つくえ", hira: "つくえ", kanji: "機", romaji: "tsukue", mean: "Bàn học/làm việc" },
+            { cat: "U7.2", main: "ソファー", hira: "ソファー", kanji: "", romaji: "sofaa", mean: "Ghế sofa" },
+            { cat: "U7.2", main: "でんしレンジ", hira: "でんしレンジ", kanji: "電子レンジ", romaji: "denshirenji", mean: "Lò vi sóng" },
+            { cat: "U7.2", main: "れいぞうこ", hira: "れいぞうこ", kanji: "冷蔵庫", romaji: "reizouko", mean: "Tủ lạnh" },
+            { cat: "U7.2", main: "さとう", hira: "さとう", kanji: "砂糖", romaji: "satou", mean: "Đường" },
+            { cat: "U7.2", main: "しお", hira: "しお", kanji: "塩", romaji: "shio", mean: "Muối" },
+            { cat: "U7.2", main: "しょうゆ", hira: "しょうゆ", kanji: "醤油", romaji: "shouyu", mean: "Xì dầu / Nước tương" },
+            { cat: "U7.2", main: "コップ", hira: "コップ", kanji: "", romaji: "koppu", mean: "Cái cốc" },
+            { cat: "U7.2", main: "スプーン", hira: "スプーン", kanji: "", romaji: "supuun", mean: "Muỗng, thìa" },
+            { cat: "U7.2", main: "ナイフ", hira: "ナイフ", kanji: "", romaji: "naifu", mean: "Con dao" },
+            { cat: "U7.2", main: "フォーク", hira: "フォーク", kanji: "", romaji: "fooku", mean: "Cái nĩa" },
+            { cat: "U7.2", main: "はし", hira: "はし", kanji: "箸", romaji: "hashi", mean: "Đôi đũa" },
+            { cat: "U7.2", main: "て", hira: "て", kanji: "手", romaji: "te", mean: "Bàn tay" },
+            { cat: "U7.2", main: "かんじ", hira: "かんじ", kanji: "漢字", romaji: "kanji", mean: "Chữ Hán Kanji" },
+            { cat: "U7.2", main: "あらいます", hira: "あらいます", kanji: "洗います", romaji: "araimasu", mean: "Rửa" },
+            { cat: "U7.2", main: "おきます", hira: "おきます", kanji: "置きます", romaji: "okimasu", mean: "Đặt, để" },
+            { cat: "U7.2", main: "かきます", hira: "かきます", kanji: "書きます", romaji: "kakimasu", mean: "Viết" },
+            { cat: "U7.2", main: "かします", hira: "かします", kanji: "貸します", romaji: "kashimasu", mean: "Cho mượn" },
+            { cat: "U7.2", main: "ききます", hira: "ききます", kanji: "聞きます", romaji: "kikimasu", mean: "Hỏi / Nghe" },
+            { cat: "U7.2", main: "きります", hira: "きります", kanji: "切ります", romaji: "kirimasu", mean: "Cắt" },
+            { cat: "U7.2", main: "つかいます", hira: "つかいます", kanji: "使います", romaji: "tsukaimasu", mean: "Dùng, sử dụng" },
+            { cat: "U7.2", main: "てつだいます", hira: "てつだいます", kanji: "手伝います", romaji: "tetsudaimasu", mean: "Giúp đỡ" },
+            { cat: "U7.2", main: "わかります", hira: "わかります", kanji: "分かります", romaji: "wakarimasu", mean: "Hiểu, biết" },
+            { cat: "U7.2", main: "いれます", hira: "いれます", kanji: "入れます", romaji: "iremasu", mean: "Cho vào, bỏ vào" },
+            { cat: "U7.2", main: "だします", hira: "だします", kanji: "出します", romaji: "dashimasu", mean: "Lấy ra, nộp" },
+            { cat: "U7.2", main: "おしえます", hira: "おしえます", kanji: "教えます", romaji: "oshiemasu", mean: "Dạy / Chỉ bảo" },
+
+            // UNIT 7.3
+            { cat: "U7.3", main: "うた", hira: "うた", kanji: "歌", romaji: "uta", mean: "Bài hát" },
+            { cat: "U7.3", main: "ギター", hira: "ギター", kanji: "", romaji: "gitaa", mean: "Đàn ghi-ta" },
+            { cat: "U7.3", main: "たばこ", hira: "たばこ", kanji: "", romaji: "tabako", mean: "Thuốc lá" },
+            { cat: "U7.3", main: "でんわ", hira: "でんわ", kanji: "電話", romaji: "denwa", mean: "Điện thoại" },
+            { cat: "U7.3", main: "まど", hira: "まど", kanji: "窓", romaji: "mado", mean: "Cửa sổ" },
+            { cat: "U7.3", main: "もっていきます", hira: "もっていきます", kanji: "持って行きます", romaji: "motte ikimasu", mean: "Mang đi" },
+            { cat: "U7.3", main: "もってきます", hira: "もってきます", kanji: "持って来ます", romaji: "motte kimasu", mean: "Mang đến" },
+
+            // KANJI LESSON 4
+            { cat: "KANJI_4", main: "東", hira: "ひがし", kanji: "東", romaji: "higashi", mean: "Đông (Hướng đông)" },
+            { cat: "KANJI_4", main: "京", hira: "とうきょう", kanji: "東京", romaji: "toukyou", mean: "Kinh (Tokyo)" },
+            { cat: "KANJI_4", main: "名", hira: "なまえ", kanji: "名前", romaji: "namae", mean: "Danh (Tên)" },
+            { cat: "KANJI_4", main: "前", hira: "まえ / ごぜん", kanji: "前 / 午前", romaji: "mae / gozen", mean: "Tiền (Trước / Buổi sáng)" },
+            { cat: "KANJI_4", main: "国", hira: "くに / がいこく", kanji: "国 / 外国", romaji: "kuni / gaikoku", mean: "Quốc (Đất nước / Nước ngoài)" },
+            { cat: "KANJI_4", main: "男", hira: "おとこのひと", kanji: "男の人", romaji: "otoko no hito", mean: "Nam (Người đàn ông)" },
+            { cat: "KANJI_4", main: "女", hira: "おんなのひと", kanji: "女の人", romaji: "onna no hito", mean: "Nữ (Người phụ nữ)" },
+            { cat: "KANJI_4", main: "区", hira: "~く", kanji: "~区", romaji: "~ku", mean: "Khu (Quận / Khu vực)" },
+            { cat: "KANJI_4", main: "市", hira: "し / ホーチミンし", kanji: "市 / ホーチミン市", romaji: "shi / hoochimin-shi", mean: "Thị (Thành phố)" },
+
+            // KANJI LESSON 5
+            { cat: "KANJI_5", main: "先", hira: "せんせい / せんげつ", kanji: "先生 / 先月", romaji: "sensei / sengetsu", mean: "Tiên (Thầy cô / Tháng trước)" },
+            { cat: "KANJI_5", main: "週", hira: "せんしゅう / いっしゅうかん", kanji: "先週 / 一週間", romaji: "senshuu / isshuukan", mean: "Chu (Tuần trước / 1 tuần)" },
+            { cat: "KANJI_5", main: "毎", hira: "まいにち / まいしゅう", kanji: "毎日 / 毎週", romaji: "mainichi / maishuu", mean: "Mỗi (Mỗi ngày / Mỗi tuần)" },
+            { cat: "KANJI_5", main: "午", hira: "ごぜん / ごご", kanji: "午前 / 午後", romaji: "gozen / gogo", mean: "Ngọ (AM / PM)" },
+            { cat: "KANJI_5", main: "後", hira: "うしろ / ごご", kanji: "後ろ / 午後", romaji: "ushiro / gogo", mean: "Hậu (Phía sau / Buổi chiều)" },
+            { cat: "KANJI_5", main: "見", hira: "みます", kanji: "見ます", romaji: "mimasu", mean: "Kiến (Xem, nhìn)" },
+            { cat: "KANJI_5", main: "食", hira: "たべます", kanji: "食べます", romaji: "tabemasu", mean: "Thực (Ăn)" },
+            { cat: "KANJI_5", main: "飲", hira: "のみます", kanji: "飲みます", romaji: "nomimasu", mean: "Ẩm (Uống)" },
+            { cat: "KANJI_5", main: "買", hira: "かいます", kanji: "買います", romaji: "kaimasu", mean: "Mãi (Mua)" },
+            { cat: "KANJI_5", main: "物", hira: "たべもの", kanji: "食べ物", romaji: "tabemono", mean: "Vật (Đồ vật, đồ ăn)" },
+
+            // KANJI LESSON 6
+            { cat: "KANJI_6", main: "行", hira: "いきます", kanji: "行きます", romaji: "ikimasu", mean: "Hành (Đi)" },
+            { cat: "KANJI_6", main: "休", hira: "やすみ", kanji: "休み", romaji: "yasumi", mean: "Hưu (Nghỉ ngơi)" },
+            { cat: "KANJI_6", main: "今", hira: "いま / きょう", kanji: "今 / 今日", romaji: "ima / kyou", mean: "Kim (Bây giờ / Hôm nay)" },
+            { cat: "KANJI_6", main: "来", hira: "きます / らいしゅう", kanji: "来ます / 来週", romaji: "kimasu / raishuu", mean: "Lai (Đến / Tuần sau)" },
+            { cat: "KANJI_6", main: "帰", hira: "かえります", kanji: "帰ります", romaji: "kaerimasu", mean: "Quy (Trở về)" },
+            { cat: "KANJI_6", main: "会", hira: "あいます / かいしゃ", kanji: "会います / 会社", romaji: "aimasu / kaisha", mean: "Hội (Gặp / Công ty)" },
+            { cat: "KANJI_6", main: "社", hira: "かいしゃ", kanji: "会社", romaji: "kaisha", mean: "Xã (Công ty)" },
+            { cat: "KANJI_6", main: "聞", hira: "ききます / しんぶん", kanji: "聞きます / 新聞", romaji: "kikimasu / shinbun", mean: "Văn (Nghe / Báo)" },
+            { cat: "KANJI_6", main: "読", hira: "よみます", kanji: "読みます", romaji: "yomimasu", mean: "Độc (Đọc)" },
+            { cat: "KANJI_6", main: "書", hira: "かきます", kanji: "書きます", romaji: "kakimasu", mean: "Thư (Viết)" },
+            { cat: "KANJI_6", main: "話", hira: "はなします / でんわ", kanji: "話します / 電話", romaji: "hanashimasu / denwa", mean: "Thoại (Nói chuyện / Điện thoại)" },
+            { cat: "KANJI_6", main: "寺", hira: "おてら", kanji: "お寺", romaji: "otera", mean: "Tự (Chùa)" },
+            { cat: "KANJI_6", main: "言", hira: "いいます", kanji: "言います", romaji: "iimasu", mean: "Ngôn (Nói)" },
+            { cat: "KANJI_6", main: "貝", hira: "かい", kanji: "貝", romaji: "kai", mean: "Bôi (Con sò, vỏ sò)" },
+            { cat: "KANJI_6", main: "田", hira: "たなかさん", kanji: "田中さん", romaji: "tanaka-san", mean: "Điền (Ruộng)" },
+            { cat: "KANJI_6", main: "力", hira: "ちから", kanji: "力", romaji: "chikara", mean: "Lực (Sức mạnh)" },
+            { cat: "KANJI_6", main: "門", hira: "もん", kanji: "門", romaji: "mon", mean: "Môn (Cổng)" },
+            { cat: "KANJI_6", main: "肉", hira: "にく", kanji: "肉", romaji: "niku", mean: "Nhục (Thịt)" },
+            { cat: "KANJI_6", main: "料", hira: "りょうり", kanji: "料理", romaji: "ryouri", mean: "Liệu (Món ăn)" },
+            { cat: "KANJI_6", main: "理", hira: "りょうり", kanji: "料理", romaji: "ryouri", mean: "Lý (Món ăn)" },
+            { cat: "KANJI_6", main: "野", hira: "やさい", kanji: "野菜", romaji: "yasai", mean: "Dã (Rau)" },
+
+            // KANJI LESSON 7
+            { cat: "KANJI_7", main: "半", hira: "はんぶん / いちじはん", kanji: "半分 / 一時半", romaji: "hanbun / ichijihan", mean: "Bán (Nửa / 1 giờ rưỡi)" },
+            { cat: "KANJI_7", main: "大", hira: "おおきい / だいがく", kanji: "大きい / 大学", romaji: "ookii / daigaku", mean: "Đại (To lớn / Đại học)" },
+            { cat: "KANJI_7", main: "小", hira: "ちいさい", kanji: "小さい", romaji: "chiisai", mean: "Tiểu (Nhỏ bé)" }
+        ];
+
+        // ==========================================
+        // 2. GLOBAL STATE APP
+        // ==========================================
+        let currentMode = 'welcome';
+        let currentCategory = 'ALL';
+        let activeItems = [...rawDataset];
+        
+        // Stats
+        let stats = {
+            score: 0,
+            streak: 0,
+            highScore: localStorage.getItem('jp_high_score') || 0
+        };
+
+        // Flashcard State
+        let fcIndex = 0;
+        let isFlipped = false;
+        let autoPlayTimer = null;
+
+        // Quiz State
+        let quizIndex = 0;
+        let quizScore = 0;
+        let quizAnswered = false;
+
+        // Matching Game State
+        let matchFlippedCards = [];
+        let matchMatchedPairs = 0;
+        let totalMatchPairs = 6;
+
+        // ==========================================
+        // 3. CORE UTILITIES & INIT
+        // ==========================================
+        window.onload = function() {
+            updateGlobalStats();
+            filterDataset();
+        };
+
+        function updateGlobalStats() {
+            document.getElementById('stat-total-words').textContent = rawDataset.filter(i => !i.cat.startsWith('KANJI')).length;
+            document.getElementById('stat-total-kanji').textContent = rawDataset.filter(i => i.cat.startsWith('KANJI')).length;
+            document.getElementById('stat-high-score').textContent = stats.highScore;
+            document.getElementById('stat-streak').textContent = stats.streak;
+        }
+
+        function filterDataset() {
+            const filterVal = document.getElementById('category-filter').value;
+            currentCategory = filterVal;
+
+            if (filterVal === 'ALL') {
+                activeItems = [...rawDataset];
+            } else if (filterVal === 'KANJI_ALL') {
+                activeItems = rawDataset.filter(item => item.cat.startsWith('KANJI'));
+            } else {
+                activeItems = rawDataset.filter(item => item.cat === filterVal);
+            }
+
+            if (activeItems.length === 0) {
+                activeItems = [...rawDataset];
+            }
+        }
+
+        function onFilterChange() {
+            filterDataset();
+            restartCurrentMode();
+        }
+
+        function shuffleCurrentDataset() {
+            for (let i = activeItems.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [activeItems[i], activeItems[j]] = [activeItems[j], activeItems[i]];
+            }
+            restartCurrentMode();
+        }
+
+        function switchMode(mode) {
+            currentMode = mode;
+            stopAutoPlay();
+
+            // Hide all views
+            ['welcome', 'flashcard', 'quiz', 'matching'].forEach(v => {
+                document.getElementById(`view-${v}`).classList.add('hidden');
+            });
+
+            // Reset buttons styling
+            ['flashcard', 'quiz', 'matching'].forEach(b => {
+                const btn = document.getElementById(`btn-mode-${b}`);
+                if (btn) {
+                    btn.classList.remove('bg-white', 'shadow-sm', 'text-indigo-600', 'font-bold');
+                    btn.classList.add('text-slate-600');
+                }
+            });
+
+            // Show selected view
+            document.getElementById(`view-${mode}`).classList.remove('hidden');
+
+            const activeBtn = document.getElementById(`btn-mode-${mode}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-white', 'shadow-sm', 'text-indigo-600', 'font-bold');
+                activeBtn.classList.remove('text-slate-600');
+            }
+
+            // Init Mode Content
+            if (mode === 'flashcard') initFlashcardMode();
+            if (mode === 'quiz') initQuizMode();
+            if (mode === 'matching') initMatchingGame();
+        }
+
+        function restartCurrentMode() {
+            if (currentMode === 'flashcard') initFlashcardMode();
+            else if (currentMode === 'quiz') initQuizMode();
+            else if (currentMode === 'matching') initMatchingGame();
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ja-JP';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // ==========================================
+        // 4. FLASHCARD MODE LOGIC
+        // ==========================================
+        function initFlashcardMode() {
+            fcIndex = 0;
+            isFlipped = false;
+            renderFlashcard();
+        }
+
+        function renderFlashcard() {
+            if (!activeItems || activeItems.length === 0) return;
+            const item = activeItems[fcIndex];
+
+            // Reset flip state
+            const fcElem = document.getElementById('flashcard-element');
+            fcElem.classList.remove('rotate-y-180');
+            isFlipped = false;
+
+            // Render Front
+            document.getElementById('fc-category-badge').textContent = item.cat;
+            document.getElementById('fc-front-main').textContent = item.main;
+            document.getElementById('fc-front-sub').textContent = item.romaji ? `(${item.romaji})` : '';
+
+            // Render Back
+            document.getElementById('fc-back-kanji-hira').textContent = item.kanji ? `${item.kanji} (${item.hira})` : item.hira;
+            document.getElementById('fc-back-romaji').textContent = item.romaji;
+            document.getElementById('fc-back-meaning').textContent = item.mean;
+
+            // Update Progress
+            document.getElementById('fc-progress-text').textContent = `Thẻ ${fcIndex + 1} / ${activeItems.length}`;
+        }
+
+        function flipFlashcard() {
+            const fcElem = document.getElementById('flashcard-element');
+            isFlipped = !isFlipped;
+            if (isFlipped) {
+                fcElem.classList.add('rotate-y-180');
+                speakText(activeItems[fcIndex].hira || activeItems[fcIndex].main);
+            } else {
+                fcElem.classList.remove('rotate-y-180');
+            }
+        }
+
+        function nextFlashcard() {
+            if (fcIndex < activeItems.length - 1) {
+                fcIndex++;
+            } else {
+                fcIndex = 0;
+            }
+            renderFlashcard();
+        }
+
+        function prevFlashcard() {
+            if (fcIndex > 0) {
+                fcIndex--;
+            } else {
+                fcIndex = activeItems.length - 1;
+            }
+            renderFlashcard();
+        }
+
+        function markFlashcardMastered() {
+            stats.score += 10;
+            stats.streak += 1;
+            updateGlobalStats();
+            nextFlashcard();
+        }
+
+        function speakCurrentWord() {
+            if (activeItems[fcIndex]) {
+                speakText(activeItems[fcIndex].hira || activeItems[fcIndex].main);
+            }
+        }
+
+        function toggleAutoPlayFlashcard() {
+            const btn = document.getElementById('btn-fc-autoplay');
+            if (autoPlayTimer) {
+                stopAutoPlay();
+                btn.innerHTML = `<i class="fa-solid fa-play"></i> Tự động lật`;
+                btn.classList.remove('bg-rose-100', 'text-rose-600');
+            } else {
+                btn.innerHTML = `<i class="fa-solid fa-pause"></i> Dừng tự động`;
+                btn.classList.add('bg-rose-100', 'text-rose-600');
+                autoPlayTimer = setInterval(() => {
+                    if (!isFlipped) {
+                        flipFlashcard();
+                    } else {
+                        nextFlashcard();
+                    }
+                }, 3000);
+            }
+        }
+
+        function stopAutoPlay() {
+            if (autoPlayTimer) {
+                clearInterval(autoPlayTimer);
+                autoPlayTimer = null;
+            }
+        }
+
+        // ==========================================
+        // 5. QUIZ MODE LOGIC
+        // ==========================================
+        function initQuizMode() {
+            quizIndex = 0;
+            quizScore = 0;
+            quizAnswered = false;
+            shuffleCurrentDataset();
+            renderQuizQuestion();
+        }
+
+        function renderQuizQuestion() {
+            if (quizIndex >= Math.min(activeItems.length, 10)) {
+                showResultModal(quizScore * 10, `${Math.round((quizScore / 10) * 100)}%`);
+                return;
+            }
+
+            quizAnswered = false;
+            document.getElementById('quiz-feedback').classList.add('hidden');
+            document.getElementById('quiz-progress-text').textContent = `Câu ${quizIndex + 1} / ${Math.min(activeItems.length, 10)}`;
+            document.getElementById('quiz-score-text').textContent = `${quizScore * 10} Pts`;
+
+            const currentQuestion = activeItems[quizIndex];
+            document.getElementById('quiz-question-display').textContent = currentQuestion.main;
+            speakText(currentQuestion.hira || currentQuestion.main);
+
+            // Generate 4 options (1 correct, 3 random wrong)
+            const options = [currentQuestion];
+            while (options.length < 4 && options.length < activeItems.length) {
+                const randItem = activeItems[Math.floor(Math.random() * activeItems.length)];
+                if (!options.find(o => o.mean === randItem.mean)) {
+                    options.push(randItem);
+                }
+            }
+
+            // Shuffle options
+            options.sort(() => Math.random() - 0.5);
+
+            // Render option buttons
+            const container = document.getElementById('quiz-options-container');
+            container.innerHTML = '';
+
+            options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "p-4 border-2 border-slate-200 rounded-2xl hover:border-indigo-500 hover:bg-indigo-50/50 font-bold text-slate-700 text-base sm:text-lg transition-all text-left flex items-center justify-between group active:scale-98";
+                btn.onclick = () => checkQuizAnswer(opt, currentQuestion, btn);
+                btn.innerHTML = `
+                    <span class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center text-xs group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                            ${String.fromCharCode(65 + idx)}
+                        </span>
+                        <span>${opt.mean}</span>
+                    </span>
+                    <i class="fa-regular fa-circle text-slate-300 group-hover:text-indigo-500"></i>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        function checkQuizAnswer(selectedOpt, correctOpt, btnElem) {
+            if (quizAnswered) return;
+            quizAnswered = true;
+
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
+
+            if (selectedOpt.mean === correctOpt.mean) {
+                quizScore++;
+                stats.score += 10;
+                stats.streak++;
+                btnElem.className = "p-4 border-2 border-emerald-500 bg-emerald-50 text-emerald-900 rounded-2xl font-bold text-base sm:text-lg text-left flex items-center justify-between";
+                btnElem.querySelector('i').className = "fa-solid fa-circle-check text-emerald-600 text-xl";
+                
+                feedback.classList.add('bg-emerald-100', 'text-emerald-800');
+                feedback.textContent = "🎉 Chính xác! Bạn trả lời rất chuẩn.";
+            } else {
+                stats.streak = 0;
+                btnElem.className = "p-4 border-2 border-rose-500 bg-rose-50 text-rose-900 rounded-2xl font-bold text-base sm:text-lg text-left flex items-center justify-between";
+                btnElem.querySelector('i').className = "fa-solid fa-circle-xmark text-rose-600 text-xl";
+
+                feedback.classList.add('bg-rose-100', 'text-rose-800');
+                feedback.textContent = `❌ Tiếc quá! Đáp án đúng là: ${correctOpt.mean}`;
+            }
+
+            updateGlobalStats();
+
+            setTimeout(() => {
+                quizIndex++;
+                renderQuizQuestion();
+            }, 1600);
+        }
+
+        // ==========================================
+        // 6. MATCHING GAME LOGIC
+        // ==========================================
+        function initMatchingGame() {
+            matchFlippedCards = [];
+            matchMatchedPairs = 0;
+            totalMatchPairs = Math.min(6, Math.floor(activeItems.length / 2) || 6);
+
+            document.getElementById('match-pairs-count').textContent = `0 / ${totalMatchPairs}`;
+
+            // Pick random items for matching
+            const shuffledPool = [...activeItems].sort(() => Math.random() - 0.5);
+            const selectedItems = shuffledPool.slice(0, totalMatchPairs);
+
+            // Create pairs: Japanese side and Vietnamese side
+            let cards = [];
+            selectedItems.forEach((item, id) => {
+                cards.push({ pairId: id, type: 'JP', text: item.main, sub: item.romaji });
+                cards.push({ pairId: id, type: 'VN', text: item.mean, sub: item.hira });
+            });
+
+            // Shuffle cards
+            cards.sort(() => Math.random() - 0.5);
+
+            // Render matching grid
+            const grid = document.getElementById('matching-grid');
+            grid.innerHTML = '';
+
+            cards.forEach((card, index) => {
+                const cardEl = document.createElement('div');
+                cardEl.className = "match-card h-28 sm:h-32 cursor-pointer select-none";
+                cardEl.dataset.index = index;
+                cardEl.dataset.pairId = card.pairId;
+
+                cardEl.innerHTML = `
+                    <div class="match-card-inner relative w-full h-full rounded-2xl shadow-sm border-2 border-slate-200 bg-white hover:border-cyan-400 transition-all">
+                        <!-- Card Front (Hidden pattern) -->
+                        <div class="backface-hidden absolute inset-0 w-full h-full rounded-2xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-white text-2xl font-black">
+                            <i class="fa-solid fa-star opacity-40"></i>
+                        </div>
+                        <!-- Card Back (Content revealed) -->
+                        <div class="rotate-y-180 backface-hidden absolute inset-0 w-full h-full rounded-2xl bg-white p-3 flex flex-col items-center justify-center text-center">
+                            <span class="text-xs font-bold ${card.type === 'JP' ? 'text-indigo-600 bg-indigo-50' : 'text-emerald-600 bg-emerald-50'} px-2 py-0.5 rounded-md mb-1">
+                                ${card.type === 'JP' ? 'Tiếng Nhật' : 'Ý Nghĩa'}
+                            </span>
+                            <p class="font-black text-sm sm:text-base text-slate-800 ${card.type === 'JP' ? 'font-jp' : ''} line-clamp-2">
+                                ${card.text}
+                            </p>
+                        </div>
+                    </div>
+                `;
+
+                cardEl.onclick = () => onMatchCardClick(cardEl, card);
+                grid.appendChild(cardEl);
+            });
+        }
+
+        function onMatchCardClick(cardEl, card) {
+            if (cardEl.classList.contains('flipped') || cardEl.classList.contains('matched')) return;
+            if (matchFlippedCards.length >= 2) return;
+
+            // Flip card
+            cardEl.classList.add('flipped');
+            matchFlippedCards.push({ element: cardEl, data: card });
+
+            if (card.type === 'JP') speakText(card.text);
+
+            if (matchFlippedCards.length === 2) {
+                const [card1, card2] = matchFlippedCards;
+
+                if (card1.data.pairId === card2.data.pairId && card1.data.type !== card2.data.type) {
+                    // Match found!
+                    setTimeout(() => {
+                        card1.element.classList.add('matched');
+                        card2.element.classList.add('matched');
+                        matchFlippedCards = [];
+                        matchMatchedPairs++;
+
+                        document.getElementById('match-pairs-count').textContent = `${matchMatchedPairs} / ${totalMatchPairs}`;
+                        stats.score += 20;
+                        updateGlobalStats();
+
+                        if (matchMatchedPairs === totalMatchPairs) {
+                            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                            setTimeout(() => {
+                                showResultModal(matchMatchedPairs * 20, '100%');
+                            }, 500);
+                        }
+                    }, 500);
+                } else {
+                    // Not matched
+                    setTimeout(() => {
+                        card1.element.classList.remove('flipped');
+                        card2.element.classList.remove('flipped');
+                        matchFlippedCards = [];
+                    }, 900);
+                }
+            }
+        }
+
+        // ==========================================
+        // 7. MODALS & CELEBRATION
+        // ==========================================
+        function showResultModal(score, accuracy) {
+            document.getElementById('result-score').textContent = score;
+            document.getElementById('result-accuracy').textContent = accuracy;
+            
+            // Save high score
+            if (score > stats.highScore) {
+                stats.highScore = score;
+                localStorage.setItem('jp_high_score', score);
+                updateGlobalStats();
+            }
+
+            const modal = document.getElementById('modal-result');
+            const content = document.getElementById('modal-result-content');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+
+            confetti({
+                particleCount: 120,
+                spread: 80,
+                origin: { y: 0.6 }
+            });
+        }
+
+        function closeResultModal() {
+            const modal = document.getElementById('modal-result');
+            const content = document.getElementById('modal-result-content');
+            
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+    </script>
+</body>
+</html>
